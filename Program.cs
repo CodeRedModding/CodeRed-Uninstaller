@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.Diagnostics;
-using System.Collections.Generic;
 
 namespace CodeRedUninstaller
 {
@@ -16,8 +13,8 @@ namespace CodeRedUninstaller
         static bool IsValidProcess(Process process)
         {
             if (process != null
-                && process.Id > 8 // A process with an id of 8 or lower is a system process, we shouldn't be trying to access those.
-                && process.MainWindowHandle != IntPtr.Zero)
+                && (process.Id > 8) // A process with an id of 8 or lower is a system process, we shouldn't be trying to access those.
+                && (process.MainWindowHandle != IntPtr.Zero))
             {
                 return true;
             }
@@ -70,17 +67,17 @@ namespace CodeRedUninstaller
 
         static void Main(string[] args)
         {
-            RegistryKey coderedKey = Registry.CurrentUser.OpenSubKey("CodeRedModding");
+            RegistryKey? coderedKey = Registry.CurrentUser.OpenSubKey("CodeRedModding");
 
             if (coderedKey != null)
             {
-                Object installObject = coderedKey.GetValue("InstallPath");
+                object? installObject = coderedKey.GetValue("InstallPath");
 
                 if (installObject != null)
                 {
-                    string installPath = installObject.ToString();
+                    string? installPath = installObject.ToString();
 
-                    if (Directory.Exists(installPath))
+                    if (!string.IsNullOrEmpty(installPath) && Directory.Exists(installPath))
                     {
                         if (CloseLauncher())
                         {
