@@ -7,11 +7,11 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
     <StartupObject>CodeRedUninstaller.Program</StartupObject>
-    <ApplicationIcon>Icon_Uninstall.ico</ApplicationIcon>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Icon_Uninstall.ico" />
+    <Content Include="Icon.ico" />
   </ItemGroup>
 
 </Project>
