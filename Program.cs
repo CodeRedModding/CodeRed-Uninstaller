@@ -14,9 +14,7 @@ namespace CodeRedUninstaller
         {
             try
             {
-                if (process != null
-                    && (process.Id > 8) // A process with an id of 8 or lower is a system process, we shouldn't be trying to access those.
-                    && (process.MainWindowHandle != IntPtr.Zero))
+                if ((process != null) && (process.Id > 8)) // A process with an id of 8 or lower is a system process, we shouldn't be trying to access those.
                 {
                     return true;
                 }
@@ -31,23 +29,21 @@ namespace CodeRedUninstaller
 
         static List<Process> GetFilteredProcesses(string filter)
         {
-            List<Process> returnList = new List<Process>();
-            Process[] processList = Process.GetProcessesByName(filter);
+            List<Process> returnList = new();
 
-            foreach (Process process in processList)
+            foreach (Process process in Process.GetProcessesByName(filter))
             {
                 if (IsValidProcess(process))
                 {
-                    if (process.ProcessName.Contains(filter) || process.MainWindowTitle.Contains(filter))
-                    {
-                        returnList.Add(process);
-                    }
+                    returnList.Add(process);
                 }
             }
 
             return returnList;
         }
 
+
+        // Launcher should already be closed by this point, so this is just for the sake of sanity checking.
         static bool CloseLauncher()
         {
             List<Process> launchers = GetFilteredProcesses("CodeRedLauncher");
@@ -56,11 +52,17 @@ namespace CodeRedUninstaller
             {
                 if (IsValidProcess(launcher))
                 {
-                    Write("Found launcher running, attempting to close \"" + launcher.Id.ToString() + "\"...");
+                    Write("(CloseLauncher) Found launcher running, attempting to close \"" + launcher.Id.ToString() + "\"...");
 
                     try
                     {
                         launcher.Kill();
+
+                        if (!launcher.WaitForExit(5000))
+                        {
+                            Write("(CloseLauncher) Failed to close launcher, timeout treshhold reached!");
+                            return false;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -98,6 +100,7 @@ namespace CodeRedUninstaller
                             catch (Exception ex)
                             {
                                 Write("Failed to delete install oath, either lacking permissions or being blocked by antivirus!");
+                                Write("Exception: " + ex.ToString());
                             }
                         }
                     }
@@ -121,7 +124,8 @@ namespace CodeRedUninstaller
                 }
                 catch (Exception ex)
                 {
-                    Write("Failed to delete registry key: " + ex.ToString());
+                    Write("Failed to delete registry key!");
+                    Write("Exception: " + ex.ToString());
                 }
             }
             else
